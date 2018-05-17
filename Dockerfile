@@ -27,16 +27,12 @@ RUN apt update && apt install -y \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) bcmath gd iconv intl mcrypt opcache pdo_mysql soap xsl zip
 
+# Get composer
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
-
-# Bypass SSH authentication prompt
-RUN mkdir /root/.ssh
-COPY id_rsa /root/.ssh
-RUN chmod 400 /root/.ssh/id_rsa && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config && echo "UserKnownHostsFile=/dev/null" >> /etc/ssh/ssh_config
 
 # Get the Magento software
 COPY auth.json /root/.composer
-RUN composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition .
+RUN composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition .
 
 # Install sample data
 COPY auth.json /var/www/html
